@@ -437,10 +437,65 @@ namespace KGLab5.ViewModel
 
         #endregion
 
+        private Point3D NormalVector(Point3D[] points)
+        {
+            var nx = (points[1].Y - points[0].Y) * (points[2].Z - points[0].Z) - (points[1].Z - points[0].Z) * (points[2].Y - points[0].Y);
+            var ny = (points[1].Z - points[0].Z) * (points[2].X - points[0].X) - (points[1].X - points[0].X) * (points[2].Z - points[0].Z);
+            var nz = (points[1].X - points[0].X) * (points[2].Y - points[0].Y) - (points[1].Y - points[0].Y) * (points[2].X - points[0].X);
+            return new Point3D(nx, ny, nz);
+        }
+        private bool IsSharpCorner(Point3D[] points)
+        {
+            var mainVector = new Point3D(0, 0, 1000);
+
+            var vector = NormalVector(points);
+
+            var cos = (vector.X * mainVector.X + vector.Y * mainVector.Y + vector.Z * mainVector.Z)
+                /(Math.Sqrt(Math.Pow(vector.X,2) + Math.Pow(vector.Y, 2) + Math.Pow(vector.Z, 2)) * 
+                  Math.Sqrt(Math.Pow(mainVector.X, 2) + Math.Pow(mainVector.Y, 2) + Math.Pow(mainVector.Z, 2)));
+            var d = Math.Acos(cos);
+            return d < 90;
+        }
+
         private void DrawFigure(double[,] matrixTransform)
         {
             var figure = MultiplyMatrix(Figure, matrixTransform);
 
+            var p = new Point[3];
+            p[0] = new Point(figure[0,0], figure[0,1]);
+            p[1] = new Point(figure[4,0], figure[4,1]);
+            p[2] = new Point(figure[2,0], figure[2,1]);
+            DrawTriangle(p);
+            var p3d = new Point3D[3];
+            p3d[0] = new Point3D(figure[0, 0], figure[0, 1], figure[0, 2]);
+            p3d[1] = new Point3D(figure[4, 0], figure[4, 1], figure[4, 2]);
+            p3d[2] = new Point3D(figure[2, 0], figure[2, 1], figure[2, 2]);
+            var b = IsSharpCorner(p3d);
+
+
+            p[0] = new Point(figure[0, 0], figure[0, 1]);
+            p[1] = new Point(figure[5, 0], figure[5, 1]);
+            p[2] = new Point(figure[2, 0], figure[2, 1]);
+            DrawTriangle(p);
+            p[0] = new Point(figure[0, 0], figure[0, 1]);
+            p[1] = new Point(figure[3, 0], figure[3, 1]);
+            p[2] = new Point(figure[4, 0], figure[4, 1]);
+            DrawTriangle(p);
+            p[0] = new Point(figure[0, 0], figure[0, 1]);
+            p[1] = new Point(figure[3, 0], figure[3, 1]);
+            p[2] = new Point(figure[5, 0], figure[5, 1]);
+            DrawTriangle(p);
+            p[0] = new Point(figure[2, 0], figure[2, 1]);
+            p[1] = new Point(figure[5, 0], figure[5, 1]);
+            p[2] = new Point(figure[4, 0], figure[4, 1]);
+            DrawTriangle(p);
+            p[0] = new Point(figure[3, 0], figure[3, 1]);
+            p[1] = new Point(figure[5, 0], figure[5, 1]);
+            p[2] = new Point(figure[4, 0], figure[4, 1]);
+            DrawTriangle(p);
+
+
+            /*
             DrawLine(new Point(figure[5, 0], figure[5, 1]), new Point(figure[0, 0], figure[0, 1]));
             DrawLine(new Point(figure[4, 0], figure[4, 1]), new Point(figure[0, 0], figure[0, 1]));
             DrawLine(new Point(figure[3, 0], figure[3, 1]), new Point(figure[0, 0], figure[0, 1]));
@@ -469,7 +524,7 @@ namespace KGLab5.ViewModel
             DrawLine(new Point(figure[3, 0], figure[3, 1]), new Point(figure[5, 0], figure[5, 1]));
             DrawLine(new Point(figure[2, 0], figure[2, 1]), new Point(figure[5, 0], figure[5, 1]));
             //DrawLine(new Point(figure[1, 0], figure[1, 1]), new Point(figure[5, 0], figure[5, 1]));
-            DrawLine(new Point(figure[0, 0], figure[0, 1]), new Point(figure[5, 0], figure[5, 1]));
+            DrawLine(new Point(figure[0, 0], figure[0, 1]), new Point(figure[5, 0], figure[5, 1]));*/
         }
 
         private void DrawAxes()
@@ -513,7 +568,6 @@ namespace KGLab5.ViewModel
             matrixShift[3, 0] = 250; matrixShift[3, 1] = 250; matrixShift[3, 2] = 0; matrixShift[3, 3] = 1;
             DrawFigure(matrixShift);
         });
-
         public RelayCommand XOZView => new(obj =>
         {
             var matrixShift = new double[4, 4];
@@ -595,6 +649,13 @@ namespace KGLab5.ViewModel
         #endregion
 
         #region Helpers
+
+        private void DrawTriangle(Point[] points, bool IsFigure = true)
+        {
+            DrawLine(points[0], points[1], IsFigure);
+            DrawLine(points[1], points[2], IsFigure);
+            DrawLine(points[2], points[0], IsFigure);
+        }
 
         private void DrawLine(Point startPoint, Point endPoint, bool IsFigure = true)
         {
