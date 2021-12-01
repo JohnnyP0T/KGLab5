@@ -344,6 +344,18 @@ namespace KGLab5.ViewModel
             }
         }
 
+        private double[,] _matrixTransform;
+
+        public double[,] MatrixTransform
+        {
+            get => _matrixTransform;
+            set
+            {
+                _matrixTransform = value;
+                OnPropertyChanged(nameof(Figure));
+            }
+        }
+
 
         public ViewModel()
         {
@@ -358,8 +370,10 @@ namespace KGLab5.ViewModel
             YPosition = CanvasHeight / 2;
             ZPosition = CanvasHeight / 2;
             DrawAxes();
-            InitFigure();
-            DrawFigure(InitMatrixTransform());
+            //InitFigure();
+            //DrawFigure(InitMatrixTransform());
+            InitMatrixTransform();
+            DrawPlot();
         }
 
         private void InitFigure()
@@ -373,14 +387,38 @@ namespace KGLab5.ViewModel
             Figure[5, 0] = 0; Figure[5, 1] = -50; Figure[5, 2] = 0; Figure[5, 3] = 1;
         }
 
+        private void InitPlot()
+        {
+            Figure = new double[100, 4];
+            var value = -3.0;
+            for (int i = 0; i < 100; i++)
+            {
+                Figure[i, 0] = value;
+                Figure[i, 1] = value;
+                Figure[i, 2] = Math.Exp((180 / Math.PI * Math.Sin(value)) - value * value);
+                Figure[i, 3] = 1;
+                value += 0.06;
+            }
+        }
+
+        private void DrawPlot()
+        {
+            InitPlot();
+            var plot = MultiplyMatrix(Figure, MatrixTransform);
+            for(int i = 0; i < 99; i++)
+            {
+                DrawLine(new Point(plot[i, 0], plot[i, 1]), new Point(plot[i + 1, 0], plot[i + 1, 1]));
+            }
+        }
+
         private double[,] InitMatrixTransform()
         {
-            var matrixShift = new double[4, 4];
-            matrixShift[0, 0] = 1; matrixShift[0, 1] = 0; matrixShift[0, 2] = 0; matrixShift[0, 3] = 0;
-            matrixShift[1, 0] = 0; matrixShift[1, 1] = 1; matrixShift[1, 2] = 0; matrixShift[1, 3] = 0;
-            matrixShift[2, 0] = 0; matrixShift[2, 1] = 0; matrixShift[2, 2] = 1; matrixShift[2, 3] = 0;
-            matrixShift[3, 0] = XPosition; matrixShift[3, 1] = YPosition; matrixShift[3, 2] = ZPosition; matrixShift[3, 3] = 1;
-            return matrixShift;
+            MatrixTransform = new double[4, 4];
+            MatrixTransform[0, 0] = 1; MatrixTransform[0, 1] = 0; MatrixTransform[0, 2] = 0; MatrixTransform[0, 3] = 0;
+            MatrixTransform[1, 0] = 0; MatrixTransform[1, 1] = 1; MatrixTransform[1, 2] = 0; MatrixTransform[1, 3] = 0;
+            MatrixTransform[2, 0] = 0; MatrixTransform[2, 1] = 0; MatrixTransform[2, 2] = 1; MatrixTransform[2, 3] = 0;
+            MatrixTransform[3, 0] = XPosition; MatrixTransform[3, 1] = YPosition; MatrixTransform[3, 2] = ZPosition; MatrixTransform[3, 3] = 1;
+            return MatrixTransform;
         }
 
         #region Transforms
