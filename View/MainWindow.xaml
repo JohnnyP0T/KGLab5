@@ -67,7 +67,7 @@
                     <Slider Margin="10, 0, 0,0"
                                 Value="{Binding Scale}"
                                 Minimum="-10"
-                                Maximum="10"
+                                Maximum="50"
                                 TickFrequency="1"
                                 TickPlacement="BottomRight" />
 

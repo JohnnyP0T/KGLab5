@@ -220,7 +220,7 @@ namespace KGLab5.ViewModel
                     {
                         CanvasView.Children.Remove(figureLine);
                     }
-                    DrawFigure(InitMatrixTransformScale(value));
+                    DrawPlot(InitMatrixTransformScale(value));
                 }
             }
         }
@@ -243,7 +243,7 @@ namespace KGLab5.ViewModel
                         CanvasView.Children.Remove(figureLine);
                     }
 
-                    DrawFigure(InitMatrixTransformRotateY(value));
+                    DrawPlot(InitMatrixTransformRotateY(value));
                 }
             }
         }
@@ -264,7 +264,7 @@ namespace KGLab5.ViewModel
                         CanvasView.Children.Remove(figureLine);
                     }
 
-                    DrawFigure(InitMatrixTransformRotateX(value));
+                    DrawPlot(InitMatrixTransformRotateX(value));
                 }
             }
         }
@@ -285,7 +285,7 @@ namespace KGLab5.ViewModel
                         CanvasView.Children.Remove(figureLine);
                     }
 
-                    DrawFigure(InitMatrixTransformRotateZ(value));
+                    DrawPlot(InitMatrixTransformRotateZ(value));
                 }
             }
         }
@@ -389,23 +389,46 @@ namespace KGLab5.ViewModel
 
         private void InitPlot()
         {
-            Figure = new double[100, 4];
+            Figure = new double[20, 4];
             var value = -3.0;
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 10; i++)
             {
                 Figure[i, 0] = value;
                 Figure[i, 1] = value;
-                Figure[i, 2] = Math.Exp((180 / Math.PI * Math.Sin(value)) - value * value);
+                Figure[i, 2] = Math.Exp((Math.Sin(value)) - value * value);
                 Figure[i, 3] = 1;
-                value += 0.06;
+                value += 0.3;
+            }
+
+            value = -3.0;
+            for (int i = 10; i < 20; i++)
+            {
+                Figure[i, 0] = value;
+                Figure[i, 1] = value;
+                Figure[i, 2] = Math.Exp((Math.Sin(value)) - value * value);
+                Figure[i, 3] = 1;
+                value += 0.3;
             }
         }
 
-        private void DrawPlot()
+        private void DrawPlot(double[,] shiftMatrix = null)
         {
             InitPlot();
-            var plot = MultiplyMatrix(Figure, MatrixTransform);
-            for(int i = 0; i < 99; i++)
+            double[,] plot;
+            if (shiftMatrix != null)
+            {
+                plot = MultiplyMatrix(Figure, shiftMatrix);
+            }
+            else
+            {
+                plot = MultiplyMatrix(Figure, MatrixTransform);
+            }
+
+            for (int i = 0; i < 9; i++)
+            {
+                DrawLine(new Point(plot[i, 0], plot[i, 1]), new Point(plot[i + 1, 0], plot[i + 1, 1]));
+            }
+            for (int i = 10; i < 19; i++)
             {
                 DrawLine(new Point(plot[i, 0], plot[i, 1]), new Point(plot[i + 1, 0], plot[i + 1, 1]));
             }
