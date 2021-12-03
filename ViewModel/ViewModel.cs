@@ -41,16 +41,16 @@ namespace KGLab5.ViewModel
             {
                 _pointDown = value;
                 OnPropertyChanged(nameof(PointDown));
-                RotationFigure(value.X);
+                RotationFigure(value.Y);
             }
         }
 
-        private async void RotationFigure(double x)
+        private async void RotationFigure(double y)
         {
-            XPosition = (int)x;
+            YPosition = (int)y;
             DrawFigure(InitMatrixTransform());
             var degrees = 0;
-            DrawLine(new Point(x, 0), new Point(x, 500), false);
+            DrawLine(new Point(0, y), new Point(CanvasHeight, y), false);
             while (!LeftButtonIsChecked)
             {
                 await Task.Run(() => Thread.Sleep(1));
@@ -63,7 +63,7 @@ namespace KGLab5.ViewModel
                     }
                     FigureLines.Clear();
                 }
-                DrawFigure(InitMatrixTransformRotateY(degrees));
+                DrawFigure(InitMatrixTransformRotateX(degrees));
             }
         }
 
@@ -349,7 +349,7 @@ namespace KGLab5.ViewModel
         {
             CanvasView = new Canvas();
             BoldValue = 3;
-            ColorLine = Colors.DeepSkyBlue;
+            ColorLine = Colors.DarkGreen;
             FigureLines = new List<Path>();
             Speed = 1;
             Scale = 1;
@@ -364,13 +364,11 @@ namespace KGLab5.ViewModel
 
         private void InitFigure()
         {
-            Figure = new double[6, 4];
+            Figure = new double[4, 4];
             Figure[0, 0] = 0; Figure[0, 1] = 0; Figure[0, 2] = 50; Figure[0, 3] = 1; // однородные координаты.
-            //Figure[1, 0] = 0; Figure[1, 1] = 0; Figure[1, 2] = -50; Figure[1, 3] = 1;
-            Figure[2, 0] = 50; Figure[2, 1] = 0; Figure[2, 2] = 0; Figure[2, 3] = 1;
-            Figure[3, 0] = -50; Figure[3, 1] = 0; Figure[3, 2] = 0; Figure[3, 3] = 1;
-            Figure[4, 0] = 0; Figure[4, 1] = 50; Figure[4, 2] = 0; Figure[4, 3] = 1;
-            Figure[5, 0] = 0; Figure[5, 1] = -50; Figure[5, 2] = 0; Figure[5, 3] = 1;
+            Figure[1, 0] = 50; Figure[1, 1] = 0; Figure[1, 2] = 0; Figure[1, 3] = 1;
+            Figure[2, 0] = -50; Figure[2, 1] = 0; Figure[2, 2] = 0; Figure[2, 3] = 1; 
+            Figure[3, 0] = 0; Figure[3, 1] = -50; Figure[3, 2] = 0; Figure[3, 3] = 1;
         }
 
         private double[,] InitMatrixTransform()
@@ -483,11 +481,11 @@ namespace KGLab5.ViewModel
 
             var p = new Point[3];
             p[0] = new Point(figure[0,0], figure[0,1]);
-            p[1] = new Point(figure[4,0], figure[4,1]);
+            p[1] = new Point(figure[1,0], figure[1,1]);
             p[2] = new Point(figure[2,0], figure[2,1]);
             var p3d = new Point3D[3];
             p3d[0] = new Point3D(figure[0, 0], figure[0, 1], figure[0, 2]);
-            p3d[1] = new Point3D(figure[4, 0], figure[4, 1], figure[4, 2]);
+            p3d[1] = new Point3D(figure[1, 0], figure[1, 1], figure[1, 2]);
             p3d[2] = new Point3D(figure[2, 0], figure[2, 1], figure[2, 2]);
             if (IsSharpCorner(p3d))
             {
@@ -500,12 +498,12 @@ namespace KGLab5.ViewModel
 
 
             p[0] = new Point(figure[0, 0], figure[0, 1]);
-            p[1] = new Point(figure[5, 0], figure[5, 1]);
-            p[2] = new Point(figure[2, 0], figure[2, 1]);
+            p[1] = new Point(figure[1, 0], figure[1, 1]);
+            p[2] = new Point(figure[3, 0], figure[3, 1]);
             p3d = new Point3D[3];
             p3d[0] = new Point3D(figure[0, 0], figure[0, 1], figure[0, 2]);
-            p3d[1] = new Point3D(figure[5, 0], figure[5, 1], figure[5, 2]);
-            p3d[2] = new Point3D(figure[2, 0], figure[2, 1], figure[2, 2]);
+            p3d[1] = new Point3D(figure[1, 0], figure[1, 1], figure[1, 2]);
+            p3d[2] = new Point3D(figure[3, 0], figure[3, 1], figure[3, 2]);
             if (IsSharpCorner(p3d))
             {
                 DrawTriangle(p, true, true);
@@ -516,12 +514,12 @@ namespace KGLab5.ViewModel
             }
 
             p[0] = new Point(figure[0, 0], figure[0, 1]);
-            p[1] = new Point(figure[3, 0], figure[3, 1]);
-            p[2] = new Point(figure[4, 0], figure[4, 1]);
+            p[1] = new Point(figure[2, 0], figure[2, 1]);
+            p[2] = new Point(figure[3, 0], figure[3, 1]);
             p3d = new Point3D[3];
             p3d[0] = new Point3D(figure[0, 0], figure[0, 1], figure[0, 2]);
-            p3d[1] = new Point3D(figure[3, 0], figure[3, 1], figure[3, 2]);
-            p3d[2] = new Point3D(figure[4, 0], figure[4, 1], figure[4, 2]);
+            p3d[1] = new Point3D(figure[2, 0], figure[2, 1], figure[2, 2]);
+            p3d[2] = new Point3D(figure[3, 0], figure[3, 1], figure[3, 2]);
             if (IsSharpCorner(p3d))
             {
                 DrawTriangle(p);
@@ -531,13 +529,13 @@ namespace KGLab5.ViewModel
                 DrawTriangle(p, true, true);
             }
 
-            p[0] = new Point(figure[0, 0], figure[0, 1]);
-            p[1] = new Point(figure[3, 0], figure[3, 1]);
-            p[2] = new Point(figure[5, 0], figure[5, 1]);
+            p[0] = new Point(figure[1, 0], figure[1, 1]);
+            p[1] = new Point(figure[2, 0], figure[2, 1]);
+            p[2] = new Point(figure[3, 0], figure[3, 1]);
             p3d = new Point3D[3];
-            p3d[0] = new Point3D(figure[0, 0], figure[0, 1], figure[0, 2]);
-            p3d[1] = new Point3D(figure[3, 0], figure[3, 1], figure[3, 2]);
-            p3d[2] = new Point3D(figure[5, 0], figure[5, 1], figure[5, 2]);
+            p3d[0] = new Point3D(figure[1, 0], figure[1, 1], figure[1, 2]);
+            p3d[1] = new Point3D(figure[2, 0], figure[2, 1], figure[2, 2]);
+            p3d[2] = new Point3D(figure[3, 0], figure[3, 1], figure[3, 2]);
             if (IsSharpCorner(p3d))
             {
                 DrawTriangle(p, true, true);
@@ -546,72 +544,6 @@ namespace KGLab5.ViewModel
             {
                 DrawTriangle(p);
             }
-
-
-            p[0] = new Point(figure[2, 0], figure[2, 1]);
-            p[1] = new Point(figure[5, 0], figure[5, 1]);
-            p[2] = new Point(figure[4, 0], figure[4, 1]);
-            p3d = new Point3D[3];
-            p3d[0] = new Point3D(figure[2, 0], figure[2, 1], figure[2, 2]);
-            p3d[1] = new Point3D(figure[5, 0], figure[5, 1], figure[5, 2]);
-            p3d[2] = new Point3D(figure[4, 0], figure[4, 1], figure[4, 2]);
-            if (IsSharpCorner(p3d))
-            {
-                DrawTriangle(p, true, true);
-            }
-            else
-            {
-                DrawTriangle(p);
-            }
-
-            p[0] = new Point(figure[3, 0], figure[3, 1]);
-            p[1] = new Point(figure[5, 0], figure[5, 1]);
-            p[2] = new Point(figure[4, 0], figure[4, 1]);
-            p3d = new Point3D[3];
-            p3d[0] = new Point3D(figure[3, 0], figure[3, 1], figure[3, 2]);
-            p3d[1] = new Point3D(figure[5, 0], figure[5, 1], figure[5, 2]);
-            p3d[2] = new Point3D(figure[4, 0], figure[4, 1], figure[4, 2]);
-            if (IsSharpCorner(p3d))
-            {
-                DrawTriangle(p);
-            }
-            else
-            {
-                DrawTriangle(p, true, true);
-            }
-
-
-
-            /*
-            DrawLine(new Point(figure[5, 0], figure[5, 1]), new Point(figure[0, 0], figure[0, 1]));
-            DrawLine(new Point(figure[4, 0], figure[4, 1]), new Point(figure[0, 0], figure[0, 1]));
-            DrawLine(new Point(figure[3, 0], figure[3, 1]), new Point(figure[0, 0], figure[0, 1]));
-            DrawLine(new Point(figure[2, 0], figure[2, 1]), new Point(figure[0, 0], figure[0, 1]));
-
-            //DrawLine(new Point(figure[5, 0], figure[5, 1]), new Point(figure[1, 0], figure[1, 1]));
-            //DrawLine(new Point(figure[4, 0], figure[4, 1]), new Point(figure[1, 0], figure[1, 1]));
-            //DrawLine(new Point(figure[3, 0], figure[3, 1]), new Point(figure[1, 0], figure[1, 1]));
-            //DrawLine(new Point(figure[2, 0], figure[2, 1]), new Point(figure[1, 0], figure[1, 1]));
-
-            DrawLine(new Point(figure[5, 0], figure[5, 1]), new Point(figure[2, 0], figure[2, 1]));
-            DrawLine(new Point(figure[4, 0], figure[4, 1]), new Point(figure[2, 0], figure[2, 1]));
-            //DrawLine(new Point(figure[1, 0], figure[1, 1]), new Point(figure[2, 0], figure[2, 1]));
-            DrawLine(new Point(figure[0, 0], figure[0, 1]), new Point(figure[2, 0], figure[2, 1]));
-
-            DrawLine(new Point(figure[5, 0], figure[5, 1]), new Point(figure[3, 0], figure[3, 1]));
-            DrawLine(new Point(figure[4, 0], figure[4, 1]), new Point(figure[3, 0], figure[3, 1]));
-            //DrawLine(new Point(figure[1, 0], figure[1, 1]), new Point(figure[3, 0], figure[3, 1]));
-            DrawLine(new Point(figure[0, 0], figure[0, 1]), new Point(figure[3, 0], figure[3, 1]));
-
-            DrawLine(new Point(figure[3, 0], figure[3, 1]), new Point(figure[4, 0], figure[4, 1]));
-            DrawLine(new Point(figure[2, 0], figure[2, 1]), new Point(figure[4, 0], figure[4, 1]));
-            //DrawLine(new Point(figure[1, 0], figure[1, 1]), new Point(figure[4, 0], figure[4, 1]));
-            DrawLine(new Point(figure[0, 0], figure[0, 1]), new Point(figure[4, 0], figure[4, 1]));
-
-            DrawLine(new Point(figure[3, 0], figure[3, 1]), new Point(figure[5, 0], figure[5, 1]));
-            DrawLine(new Point(figure[2, 0], figure[2, 1]), new Point(figure[5, 0], figure[5, 1]));
-            //DrawLine(new Point(figure[1, 0], figure[1, 1]), new Point(figure[5, 0], figure[5, 1]));
-            DrawLine(new Point(figure[0, 0], figure[0, 1]), new Point(figure[5, 0], figure[5, 1]));*/
         }
 
         private void DrawAxes()
